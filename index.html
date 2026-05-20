@@ -107,7 +107,7 @@ tr:last-child td{border-bottom:none;}
   <div class="stat"><div class="stat-label">総問題数</div><div class="stat-value" id="sTotal">―</div></div>
   <div class="stat"><div class="stat-label">完了問題数</div><div class="stat-value sm" id="sDone">0問</div></div>
   <div class="stat"><div class="stat-label">平均正答率</div><div class="stat-value" id="sRate">―</div></div>
-  <div class="stat"><div class="stat-label">5回転完了</div><div class="stat-value sm" id="sComp">0問</div></div>
+  <div class="stat"><div class="stat-label">回転数</div><div class="stat-value sm" id="sComp">0回転</div></div>
 </div>
 <div class="prog-wrap">
   <div style="display:flex;justify-content:space-between;">
@@ -469,7 +469,20 @@ function updateStats(){
     if(b)b.style.width=pct+'%';
   });
   document.getElementById('sDone').textContent=doneQ.toLocaleString()+'問';
-  document.getElementById('sComp').textContent=compQ.toLocaleString()+'問';
+  // 回転数カウント
+  const allUnits2=[];
+  SECS.forEach(sec=>sec.units.forEach(u=>allUnits2.push({hen:sec.hen,name:u.name})));
+  let completedRounds=0;
+  for(let r=0;r<5;r++){
+    const allFilled=allUnits2.every(u=>{
+      const rec=getRec(u.hen,u.name);
+      const rounds=rec.rounds||[];
+      return rounds[r]&&rounds[r].date;
+    });
+    if(allFilled)completedRounds=r+1;
+    else break;
+  }
+  document.getElementById('sComp').textContent=completedRounds+'回転';
   document.getElementById('sRate').textContent=rCnt>0?Math.round(rSum/rCnt)+'%':'―';
   const pct=Math.round(doneQ/TOTAL*100);
   document.getElementById('sPct').textContent=pct+'%';
