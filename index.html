@@ -278,9 +278,15 @@ const SECS=[
 ];
 
 const TOTAL=SECS.reduce((a,s)=>a+s.units.reduce((b,u)=>b+u.q,0),0);
-let cumul=0;
 const flatUnits=[];
-SECS.forEach(s=>s.units.forEach(u=>{cumul+=u.q;flatUnits.push({...u,hen:s.hen,remaining:TOTAL-cumul});}));
+SECS.forEach(s=>{
+  const secTotal=s.units.reduce((a,u)=>a+u.q,0);
+  let secCumul=0;
+  s.units.forEach(u=>{
+    secCumul+=u.q;
+    flatUnits.push({...u,hen:s.hen,remaining:secTotal-secCumul});
+  });
+});
 
 let DB={};
 try{DB=JSON.parse(localStorage.getItem('gyosei_app')||'{}');}catch(e){}
