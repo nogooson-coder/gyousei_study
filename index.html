@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>行政書士試験 学習管理アプリ</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;padding:12px;}
+h1{font-size:15px;font-weight:500;margin-bottom:12px;color:#1a1a1a;}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+@media(max-width:540px){.summary-grid{grid-template-columns:repeat(2,1fr);}}
+.stat{background:#fff;border:0.5px solid #e0ddd5;border-radius:8px;padding:9px 11px;}
+.stat-label{font-size:10px;color:#666;margin-bottom:2px;}
+.stat-value{font-size:16px;font-weight:500;color:#1a1a1a;}
+.stat-value.sm{font-size:13px;}
+.prog-wrap{background:#fff;border:0.5px solid #e0ddd5;border-radius:8px;padding:10px 13px;margin-bottom:10px;}
+.prog-bg{background:#e8e6de;border-radius:4px;height:7px;margin-top:5px;}
+.prog-fill{background:#378ADD;border-radius:4px;height:7px;transition:width 0.4s;}
+.global-goal-wrap{background:#fff;border:0.5px solid #e0ddd5;border-radius:8px;padding:10px 13px;margin-bottom:10px;}
+.goal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.goal-title{font-size:12px;font-weight:500;color:#1a1a1a;}
+.goal-edit-btn{font-size:10px;padding:2px 8px;border-radius:6px;border:0.5px solid #ccc;background:#f5f5f3;color:#555;cursor:pointer;}
+.goal-text{font-size:12px;color:#444;line-height:1.6;white-space:pre-wrap;word-break:break-all;}
+.goal-text.empty{color:#bbb;font-style:italic;}
+.goal-ta{width:100%;font-size:12px;padding:6px 8px;border:0.5px solid #ccc;border-radius:6px;background:#fff;color:#1a1a1a;resize:vertical;min-height:64px;font-family:inherit;line-height:1.6;}
+.goal-save-btn{margin-top:6px;font-size:11px;padding:4px 14px;border-radius:6px;border:none;background:#378ADD;color:#fff;cursor:pointer;}
+.top-btns{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.top-btn{font-size:11px;padding:5px 11px;border-radius:8px;border:0.5px solid #ccc;background:#fff;color:#555;cursor:pointer;}
+.top-btn:hover{background:#f0f0ec;}
+.sec-block{border:0.5px solid #e0ddd5;border-radius:12px;margin-bottom:8px;overflow:hidden;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer;background:#f5f5f3;}
+.sec-hdr:hover{background:#eeecea;}
+.sec-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+.badge{font-size:10px;font-weight:500;padding:3px 7px;border-radius:7px;white-space:nowrap;flex-shrink:0;}
+.h1{background:#EEEDFE;color:#3C3489;}
+.h2{background:#E6F1FB;color:#0C447C;}
+.h3{background:#E1F5EE;color:#085041;}
+.h4{background:#FAECE7;color:#712B13;}
+.h5{background:#FBEAF0;color:#72243E;}
+.h6{background:#FAEEDA;color:#633806;}
+.h7{background:#EAF3DE;color:#27500A;}
+.h8{background:#F1EFE8;color:#444441;}
+.sec-meta{font-size:10px;color:#888;white-space:nowrap;}
+.sec-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.mini-prog{width:50px;height:4px;background:#e0ddd5;border-radius:2px;}
+.mini-prog-fill{height:4px;border-radius:2px;background:#378ADD;}
+.chev{font-size:13px;color:#888;transition:transform 0.2s;display:inline-block;}
+.chev.open{transform:rotate(180deg);}
+.sec-body{display:none;border-top:0.5px solid #e0ddd5;background:#fff;}
+.sec-body.open{display:block;}
+.sec-goal-area{padding:8px 12px;border-bottom:0.5px solid #f0ede6;display:flex;align-items:flex-start;gap:8px;}
+.sec-goal-label{font-size:10px;color:#888;white-space:nowrap;padding-top:3px;flex-shrink:0;}
+.sec-goal-inner{flex:1;min-width:0;}
+.sec-goal-text{font-size:11px;color:#444;line-height:1.5;white-space:pre-wrap;word-break:break-all;cursor:pointer;}
+.sec-goal-text.empty{color:#bbb;font-style:italic;cursor:pointer;}
+.sec-goal-input{display:none;width:100%;font-size:11px;padding:4px 7px;border:0.5px solid #ccc;border-radius:6px;background:#fff;color:#1a1a1a;resize:none;font-family:inherit;line-height:1.5;min-height:44px;}
+.sec-goal-input.editing{display:block;}
+.sec-goal-text.editing{display:none;}
+.sec-goal-actions{display:none;gap:6px;margin-top:4px;}
+.sec-goal-actions.editing{display:flex;}
+.sec-goal-sbtn{font-size:10px;padding:2px 10px;border-radius:5px;border:none;background:#378ADD;color:#fff;cursor:pointer;}
+.sec-goal-cbtn{font-size:10px;padding:2px 10px;border-radius:5px;border:0.5px solid #ccc;background:#fff;color:#555;cursor:pointer;}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{background:#f5f5f3;color:#666;font-weight:500;font-size:10px;padding:5px 7px;text-align:center;border-bottom:0.5px solid #e0ddd5;border-right:0.5px solid #e0ddd5;white-space:nowrap;}
+thead th:last-child,td:last-child{border-right:none;}
+thead th.tl{text-align:left;}
+td{padding:5px 6px;border-bottom:0.5px solid #e0ddd5;border-right:0.5px solid #e0ddd5;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.tr{text-align:right;font-size:10px;color:#666;}
+.rounds-wrap{display:flex;gap:5px;flex-wrap:wrap;}
+.rchip{font-size:10px;display:flex;align-items:center;gap:2px;white-space:nowrap;}
+.rn{color:#888;}
+.rd{color:#1a1a1a;}
+.score-frac{font-size:10px;font-weight:500;padding:1px 4px;border-radius:9px;margin-left:2px;}
+.shi{background:#EAF3DE;color:#27500A;}
+.smi{background:#FAEEDA;color:#633806;}
+.slo{background:#FCEBEB;color:#791F1F;}
+.rec-btn{font-size:10px;padding:2px 6px;border-radius:5px;border:0.5px solid #ccc;background:#fff;color:#555;cursor:pointer;}
+.rec-btn:hover{background:#f5f5f3;}
+.ov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);align-items:flex-start;justify-content:center;padding:1.5rem 1rem;z-index:100;overflow-y:auto;}
+.ov.open{display:flex;}
+.modal{background:#fff;border-radius:12px;border:0.5px solid #e0ddd5;padding:1.1rem;width:100%;max-width:440px;margin-top:10px;}
+.mtitle{font-size:13px;font-weight:500;margin-bottom:3px;color:#1a1a1a;}
+.msub{font-size:11px;color:#666;margin-bottom:1rem;}
+.rblock{border:0.5px solid #e0ddd5;border-radius:8px;padding:8px 10px;margin-bottom:6px;}
+.rbtitle{font-size:11px;font-weight:500;color:#666;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.frow{display:grid;grid-template-columns:60px 1fr;gap:8px;align-items:center;margin-bottom:5px;}
+.frow:last-child{margin-bottom:0;}
+.flabel{font-size:11px;color:#666;}
+.finput{font-size:12px;padding:5px 7px;border:0.5px solid #ccc;border-radius:6px;background:#fff;color:#1a1a1a;width:100%;}
+.finput.narrow{width:70px;}
+.fixed-total{font-size:12px;color:#888;font-weight:500;}
+.frac-preview{font-size:11px;font-weight:500;}
+.memo-ta{width:100%;font-size:12px;padding:6px 8px;border:0.5px solid #ccc;border-radius:6px;background:#fff;color:#1a1a1a;resize:vertical;min-height:52px;font-family:inherit;}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;}
+.bsave{font-size:12px;padding:6px 16px;border-radius:6px;border:none;background:#378ADD;color:#fff;cursor:pointer;}
+.bcancel{font-size:12px;padding:6px 16px;border-radius:6px;border:0.5px solid #ccc;background:#fff;color:#555;cursor:pointer;}
+.data-area{font-size:11px;padding:7px;border:0.5px solid #ccc;border-radius:6px;width:100%;min-height:80px;font-family:monospace;resize:vertical;color:#1a1a1a;background:#f9f9f7;}
+.notice{font-size:11px;color:#666;margin-top:5px;}
+</style>
+</head>
+<body>
+<h1>&#128218; 行政書士試験 学習管理アプリ</h1>
+<div class="summary-grid">
+  <div class="stat"><div class="stat-label">総問題数</div><div class="stat-value" id="sTotal">―</div></div>
+  <div class="stat"><div class="stat-label">完了問題数</div><div class="stat-value sm" id="sDone">0問</div></div>
+  <div class="stat"><div class="stat-label">平均正答率</div><div class="stat-value" id="sRate">―</div></div>
+  <div class="stat"><div class="stat-label">5回転完了</div><div class="stat-value sm" id="sComp">0問</div></div>
+</div>
+<div class="prog-wrap">
+  <div style="display:flex;justify-content:space-between;">
+    <span style="font-size:11px;color:#666;">学習進捗（1回目完了ベース）</span>
+    <span style="font-size:11px;font-weight:500;" id="sPct">0%</span>
+  </div>
+  <div class="prog-bg"><div class="prog-fill" id="sBar" style="width:0%;"></div></div>
+</div>
+<div class="global-goal-wrap">
+  <div class="goal-header">
+    <div class="goal-title">&#127945; 全体目標</div>
+    <button class="goal-edit-btn" id="gGoalBtn" onclick="toggleGlobalGoal()">編集</button>
+  </div>
+  <div id="gGoalText" class="goal-text empty">目標を入力してください...</div>
+  <textarea class="goal-ta" id="gGoalTa" style="display:none;" placeholder="例）2025年11月の試験で合格！1日50問ペースで進める。"></textarea>
+  <div id="gGoalActions" style="display:none;">
+    <button class="goal-save-btn" onclick="saveGlobalGoal()">保存</button>
+    <button class="goal-save-btn" onclick="cancelGlobalGoal()" style="background:#ccc;margin-left:6px;">キャンセル</button>
+  </div>
+</div>
+<div class="top-btns">
+  <button class="top-btn" id="taBtn" onclick="toggleAll()">&#9660; すべて展開</button>
+  <button class="top-btn" onclick="openExport()">&#8659; エクスポート</button>
+  <button class="top-btn" onclick="openImport()">&#8657; インポート</button>
+</div>
+<div id="secContainer"></div>
+
+<div class="ov" id="ov">
+<div class="modal">
+  <div class="mtitle" id="mTitle"></div>
+  <div class="msub" id="mSub"></div>
+  <div id="mRounds"></div>
+  <div style="margin-top:8px;">
+    <div style="font-size:11px;font-weight:500;color:#666;margin-bottom:3px;">メモ</div>
+    <textarea class="memo-ta" id="mMemo" placeholder="気づき・苦手ポイントなど..."></textarea>
+  </div>
+  <div class="mbtns">
+    <button class="bcancel" onclick="closeModal()">キャンセル</button>
+    <button class="bsave" onclick="saveModal()">保存</button>
+  </div>
+</div>
+</div>
+
+<div class="ov" id="ovExp">
+<div class="modal">
+  <div class="mtitle">データをエクスポート</div>
+  <div class="msub" style="margin-bottom:8px;">下のテキストをコピーして保存してください。</div>
+  <textarea class="data-area" id="expArea" readonly></textarea>
+  <div class="mbtns">
+    <button class="bcancel" onclick="document.getElementById('ovExp').classList.remove('open')">閉じる</button>
+    <button class="bsave" onclick="copyExport()">コピー</button>
+  </div>
+</div>
+</div>
+
+<div class="ov" id="ovImp">
+<div class="modal">
+  <div class="mtitle">データをインポート</div>
+  <div class="msub" style="margin-bottom:8px;">エクスポートしたテキストを貼り付けてください。現在のデータは上書きされます。</div>
+  <textarea class="data-area" id="impArea" placeholder="ここにエクスポートデータを貼り付け..."></textarea>
+  <div class="notice">※ 貼り付け後「インポート実行」を押してください</div>
+  <div class="mbtns">
+    <button class="bcancel" onclick="document.getElementById('ovImp').classList.remove('open')">キャンセル</button>
+    <button class="bsave" onclick="doImport()">インポート実行</button>
+  </div>
+</div>
+</div>
+
+<script>
+const SECS=[
+  {hen:"第１編 憲法",hc:"h1",units:[
+    {name:"憲法総論(1) 憲法とは",q:3},
+    {name:"人権(1) 人権総論",q:29},
+    {name:"人権(2) 包括的基本権",q:19},
+    {name:"人権(3) 法の下の平等",q:16},
+    {name:"人権(4) 精神的自由",q:37},
+    {name:"人権(5) 経済的自由",q:13},
+    {name:"人権(6) 人身の自由",q:20},
+    {name:"人権(7) 受益権",q:7},
+    {name:"人権(8) 参政権",q:6},
+    {name:"人権(9) 社会権",q:16},
+    {name:"統治(1) 統治総論",q:1},
+    {name:"統治(2) 天皇",q:15},
+    {name:"統治(3) 国会",q:47},
+    {name:"統治(4) 内閣",q:36},
+    {name:"統治(5) 裁判所",q:39},
+    {name:"統治(6) 財政",q:19},
+    {name:"統治(7) 地方自治",q:9},
+    {name:"統治(8) 憲法改正等",q:8}]},
+  {hen:"第２編 民法",hc:"h2",units:[
+    {name:"総則(1) 民法序論",q:2},
+    {name:"総則(2) 権利の主体",q:52},
+    {name:"総則(3) 権利の客体",q:5},
+    {name:"総則(4) 法律行為",q:3},
+    {name:"総則(5) 意思表示",q:40},
+    {name:"総則(6) 代理",q:40},
+    {name:"総則(7) 条件・期限・期間",q:15},
+    {name:"総則(8) 時効",q:25},
+    {name:"物権(1) 物権",q:4},
+    {name:"物権(2) 物権変動",q:54},
+    {name:"物権(3) 占有権",q:13},
+    {name:"物権(4) 所有権",q:35},
+    {name:"物権(5) 用益物権",q:10},
+    {name:"物権(6) 担保物権",q:108},
+    {name:"債権総論(1) 総説",q:10},
+    {name:"債権総論(2) 債権の効力",q:44},
+    {name:"債権総論(3) 多数当事者間の債権債務関係",q:38},
+    {name:"債権総論(4) 債権譲渡",q:17},
+    {name:"債権総論(5) 債権の消滅",q:36},
+    {name:"債権各論(1) 契約総論",q:30},
+    {name:"債権各論(2) 契約各論",q:157},
+    {name:"債権各論(3) 契約以外の法律関係",q:80},
+    {name:"家族法(1) 親族",q:74},
+    {name:"家族法(2) 相続",q:73}]},
+  {hen:"第３編 行政法",hc:"h3",units:[
+    {name:"行政法総論(1) 総説",q:26},
+    {name:"行政法総論(2) 行政組織",q:49},
+    {name:"行政法総論(3) 行政立法",q:26},
+    {name:"行政法総論(4) 行政行為",q:87},
+    {name:"行政法総論(5) 行政契約・行政指導",q:18},
+    {name:"行政法総論(6) 行政計画",q:2},
+    {name:"行政法総論(7) 行政上の強制手段",q:47},
+    {name:"行政法総論(8) 行政調査",q:11},
+    {name:"行政手続法(1) 総説",q:23},
+    {name:"行政手続法(2) 申請に対する処分",q:34},
+    {name:"行政手続法(3) 不利益処分",q:53},
+    {name:"行政手続法(4) 行政指導・届出",q:32},
+    {name:"行政手続法(5) 命令等を定める手続",q:24},
+    {name:"行政不服審査法(1) 総説",q:10},
+    {name:"行政不服審査法(2) 要件",q:13},
+    {name:"行政不服審査法(3) 審理手続等",q:64},
+    {name:"行政事件訴訟法(1) 取消訴訟",q:131},
+    {name:"行政事件訴訟法(2) その他の訴訟",q:65},
+    {name:"国家賠償法(1) 1条",q:39},
+    {name:"国家賠償法(2) 2条",q:9},
+    {name:"国家賠償法(3) 3条以下",q:17},
+    {name:"損失補償(1) 損失補償",q:11},
+    {name:"地方自治法(1) 総説",q:24},
+    {name:"地方自治法(2) 機関",q:29},
+    {name:"地方自治法(3) 住民",q:54},
+    {name:"地方自治法(4) 条例・規則",q:9},
+    {name:"地方自治法(5) 財務",q:9},
+    {name:"地方自治法(6) 関与",q:9},
+    {name:"地方自治法(7) 係争処理手続",q:5}]},
+  {hen:"第４編 商法・会社法",hc:"h4",units:[
+    {name:"商法(1) 商法",q:45},
+    {name:"会社法(1) 設立",q:29},
+    {name:"会社法(2) 株式",q:15},
+    {name:"会社法(3) 機関",q:51},
+    {name:"会社法(4) 計算",q:5},
+    {name:"会社法(5) 持分会社",q:5}]},
+  {hen:"第５編 基礎法学",hc:"h5",units:[
+    {name:"法とは何か(1) 法とは何か",q:36},
+    {name:"紛争解決と司法制度(1) 紛争解決と司法制度",q:38},
+    {name:"法令用語等(1) 法令用語等",q:26}]},
+  {hen:"第６編 行政書士業務関連諸法令",hc:"h6",units:[
+    {name:"行政書士法(1) 行政書士法",q:75},
+    {name:"その他諸法令(1) 戸籍法",q:34},
+    {name:"その他諸法令(2) 住民基本台帳法",q:16}]},
+  {hen:"第７編 一般知識（政治・経済・社会）",hc:"h7",units:[
+    {name:"政治(1) 政治",q:80},
+    {name:"経済(1) 経済",q:23},
+    {name:"社会(1) 社会",q:37}]},
+  {hen:"第８編 情報通信・個人情報保護",hc:"h8",units:[
+    {name:"情報通信(1) 情報の公開",q:4},
+    {name:"情報通信(2) 用語",q:26},
+    {name:"個人情報保護(1) 個人情報保護法",q:20}]}
+];
+
+const TOTAL=SECS.reduce((a,s)=>a+s.units.reduce((b,u)=>b+u.q,0),0);
+let cumul=0;
+const flatUnits=[];
+SECS.forEach(s=>s.units.forEach(u=>{cumul+=u.q;flatUnits.push({...u,hen:s.hen,remaining:TOTAL-cumul});}));
+
+let DB={};
+try{DB=JSON.parse(localStorage.getItem('gyosei_app')||'{}');}catch(e){}
+function saveDB(){try{localStorage.setItem('gyosei_app',JSON.stringify(DB));}catch(e){}}
+function getKey(hen,name){return hen+'\x01'+name;}
+function getRec(hen,name){return DB[getKey(hen,name)]||{rounds:[{},{},{},{},{}],memo:''};}
+function getGoalKey(hen){return '__goal__'+hen;}
+function getGoal(hen){return DB[getGoalKey(hen)]||'';}
+function setGoal(hen,val){DB[getGoalKey(hen)]=val;saveDB();}
+const GLOBAL_GOAL_KEY='__global_goal__';
+function getGlobalGoal(){return DB[GLOBAL_GOAL_KEY]||'';}
+function setGlobalGoal(val){DB[GLOBAL_GOAL_KEY]=val;saveDB();}
+
+function initGlobalGoal(){
+  const val=getGlobalGoal();
+  const el=document.getElementById('gGoalText');
+  if(val){el.textContent=val;el.classList.remove('empty');}
+  else{el.textContent='目標を入力してください...';el.classList.add('empty');}
+}
+function toggleGlobalGoal(){
+  const ta=document.getElementById('gGoalTa');
+  const actions=document.getElementById('gGoalActions');
+  const btn=document.getElementById('gGoalBtn');
+  const text=document.getElementById('gGoalText');
+  const editing=ta.style.display==='none';
+  if(editing){ta.value=getGlobalGoal();ta.style.display='block';actions.style.display='block';text.style.display='none';btn.textContent='閉じる';ta.focus();}
+  else{ta.style.display='none';actions.style.display='none';text.style.display='block';btn.textContent='編集';}
+}
+function saveGlobalGoal(){
+  const val=document.getElementById('gGoalTa').value.trim();
+  setGlobalGoal(val);
+  const el=document.getElementById('gGoalText');
+  if(val){el.textContent=val;el.classList.remove('empty');}
+  else{el.textContent='目標を入力してください...';el.classList.add('empty');}
+  document.getElementById('gGoalTa').style.display='none';
+  document.getElementById('gGoalActions').style.display='none';
+  el.style.display='block';
+  document.getElementById('gGoalBtn').textContent='編集';
+}
+function cancelGlobalGoal(){
+  document.getElementById('gGoalTa').style.display='none';
+  document.getElementById('gGoalActions').style.display='none';
+  document.getElementById('gGoalText').style.display='block';
+  document.getElementById('gGoalBtn').textContent='編集';
+}
+function startEditSecGoal(si){
+  const text=document.getElementById('sgText'+si);
+  const input=document.getElementById('sgInput'+si);
+  const actions=document.getElementById('sgActions'+si);
+  input.value=getGoal(SECS[si].hen);
+  text.classList.add('editing');input.classList.add('editing');actions.classList.add('editing');input.focus();
+}
+function saveSecGoal(si){
+  const input=document.getElementById('sgInput'+si);
+  const text=document.getElementById('sgText'+si);
+  const actions=document.getElementById('sgActions'+si);
+  const val=input.value.trim();
+  setGoal(SECS[si].hen,val);
+  if(val){text.textContent=val;text.classList.remove('empty');}
+  else{text.textContent='この編の目標を入力...';text.classList.add('empty');}
+  text.classList.remove('editing');input.classList.remove('editing');actions.classList.remove('editing');
+}
+function cancelSecGoal(si){
+  document.getElementById('sgText'+si).classList.remove('editing');
+  document.getElementById('sgInput'+si).classList.remove('editing');
+  document.getElementById('sgActions'+si).classList.remove('editing');
+}
+function fracBadge(correct,total){
+  if(correct===''||correct===null||correct===undefined)return'';
+  const c=parseInt(correct),t=parseInt(total);
+  if(isNaN(c)||isNaN(t)||t===0)return'';
+  const rate=c/t;
+  const pct=Math.round(rate*100);
+  const cls=rate>=0.8?'shi':rate>=0.6?'smi':'slo';
+  return'<span class="score-frac '+cls+'">'+pct+'%</span>';
+}
+let expanded=false;
+let modalQ=0;
+function toggleAll(){
+  expanded=!expanded;
+  SECS.forEach((_,i)=>{
+    document.getElementById('body'+i).classList.toggle('open',expanded);
+    document.getElementById('chev'+i).classList.toggle('open',expanded);
+  });
+  document.getElementById('taBtn').textContent=expanded?'▲ すべて折りたたむ':'▼ すべて展開';
+}
+function toggleSec(i){
+  document.getElementById('body'+i).classList.toggle('open');
+  document.getElementById('chev'+i).classList.toggle('open');
+}
+function buildAll(){
+  document.getElementById('sTotal').textContent=TOTAL.toLocaleString()+'問';
+  const con=document.getElementById('secContainer');
+  con.innerHTML='';
+  SECS.forEach((sec,si)=>{
+    const div=document.createElement('div');
+    div.className='sec-block';
+    const hdr=document.createElement('div');
+    hdr.className='sec-hdr';
+    hdr.onclick=()=>toggleSec(si);
+    hdr.innerHTML='<div class="sec-left"><span class="badge '+sec.hc+'">'+sec.hen+'</span>'
+      +'<span class="sec-meta" id="meta'+si+'"></span></div>'
+      +'<div class="sec-right"><div class="mini-prog"><div class="mini-prog-fill" id="mpf'+si+'" style="width:0%;"></div></div>'
+      +'<span class="chev" id="chev'+si+'">&#9660;</span></div>';
+    div.appendChild(hdr);
+    const body=document.createElement('div');
+    body.className='sec-body';
+    body.id='body'+si;
+    const goalArea=document.createElement('div');
+    goalArea.className='sec-goal-area';
+    const goalLabel=document.createElement('div');
+    goalLabel.className='sec-goal-label';
+    goalLabel.textContent='目標';
+    const goalInner=document.createElement('div');
+    goalInner.className='sec-goal-inner';
+    const goalVal=getGoal(sec.hen);
+    const goalText=document.createElement('div');
+    goalText.className='sec-goal-text'+(goalVal?'':' empty');
+    goalText.id='sgText'+si;
+    goalText.textContent=goalVal||'この編の目標を入力...';
+    goalText.onclick=()=>startEditSecGoal(si);
+    const goalInput=document.createElement('textarea');
+    goalInput.className='sec-goal-input';
+    goalInput.id='sgInput'+si;
+    goalInput.placeholder='例）○月○日までに1回転完了。正答率80%以上を目指す。';
+    goalInput.rows=2;
+    const goalActions=document.createElement('div');
+    goalActions.className='sec-goal-actions';
+    goalActions.id='sgActions'+si;
+    goalActions.innerHTML='<button class="sec-goal-sbtn" onclick="saveSecGoal('+si+')">保存</button>'
+      +'<button class="sec-goal-cbtn" onclick="cancelSecGoal('+si+')">キャンセル</button>';
+    goalInner.appendChild(goalText);goalInner.appendChild(goalInput);goalInner.appendChild(goalActions);
+    goalArea.appendChild(goalLabel);goalArea.appendChild(goalInner);
+    body.appendChild(goalArea);
+    const tblWrap=document.createElement('div');
+    tblWrap.className='tbl-wrap';
+    const tbl=document.createElement('table');
+    tbl.innerHTML='<thead><tr><th class="tl" style="min-width:120px;">単元</th><th style="width:40px;">問題数</th><th style="width:58px;">残り</th><th class="tl">1〜5回目</th><th style="width:44px;"></th></tr></thead>';
+    const tbody=document.createElement('tbody');
+    sec.units.forEach(u=>{
+      const rec=getRec(sec.hen,u.name);
+      const rounds=rec.rounds||[];
+      while(rounds.length<5)rounds.push({});
+      const fu=flatUnits.find(x=>x.hen===sec.hen&&x.name===u.name);
+      const rem=fu?fu.remaining:0;
+      const chips=rounds.map((r,i)=>'<span class="rchip"><span class="rn">'+(i+1)+'.</span><span class="rd">'+(r.date||'―')+'</span>'+fracBadge(r.correct,u.q)+'</span>').join('');
+      const hasMemo=rec.memo&&rec.memo.trim();
+      const k=getKey(sec.hen,u.name);
+      const tr=document.createElement('tr');
+      tr.innerHTML='<td style="font-size:11px;">'+u.name+(hasMemo?'<span style="font-size:9px;color:#aaa;margin-left:2px;">&#128203;</span>':'')+'</td>'
+        +'<td style="text-align:right;font-size:11px;">'+u.q+'問</td>'
+        +'<td class="tr">あと'+rem.toLocaleString()+'問</td>'
+        +'<td style="padding:3px 5px;"><div class="rounds-wrap">'+chips+'</div></td>'
+        +'<td style="text-align:center;padding:3px 4px;"><button class="rec-btn" data-key="'+k+'" data-q="'+u.q+'">&#9998; 記録</button></td>';
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);tblWrap.appendChild(tbl);body.appendChild(tblWrap);
+    div.appendChild(body);con.appendChild(div);
+  });
+  con.addEventListener('click',e=>{
+    const btn=e.target.closest('.rec-btn');
+    if(btn)openModal(btn.dataset.key,parseInt(btn.dataset.q)||0);
+  });
+  updateStats();
+}
+function updateStats(){
+  let doneQ=0,compQ=0,rSum=0,rCnt=0;
+  SECS.forEach((sec,si)=>{
+    let secDoneQ=0,secTotalQ=0;
+    sec.units.forEach(u=>{
+      const rec=getRec(sec.hen,u.name);
+      const rounds=rec.rounds||[];
+      while(rounds.length<5)rounds.push({});
+      secTotalQ+=u.q;
+      if(rounds[0]&&rounds[0].date){doneQ+=u.q;secDoneQ+=u.q;}
+      if(rounds[4]&&rounds[4].date)compQ+=u.q;
+      rounds.forEach(r=>{
+        const c=parseInt(r.correct);
+        if(!isNaN(c)&&u.q>0){rSum+=Math.round(c/u.q*100);rCnt++;}
+      });
+    });
+    const pct=secTotalQ>0?Math.round(secDoneQ/secTotalQ*100):0;
+    const m=document.getElementById('meta'+si);
+    const b=document.getElementById('mpf'+si);
+    if(m)m.textContent=secDoneQ.toLocaleString()+'/'+secTotalQ.toLocaleString()+'問';
+    if(b)b.style.width=pct+'%';
+  });
+  document.getElementById('sDone').textContent=doneQ.toLocaleString()+'問';
+  document.getElementById('sComp').textContent=compQ.toLocaleString()+'問';
+  document.getElementById('sRate').textContent=rCnt>0?Math.round(rSum/rCnt)+'%':'―';
+  const pct=Math.round(doneQ/TOTAL*100);
+  document.getElementById('sPct').textContent=pct+'%';
+  document.getElementById('sBar').style.width=pct+'%';
+}
+let editKey=null;
+function openModal(key,q){
+  editKey=key;modalQ=q;
+  const parts=key.split('\x01');
+  const hen=parts[0],name=parts[1];
+  const rec=getRec(hen,name);
+  const rounds=rec.rounds||[];
+  while(rounds.length<5)rounds.push({});
+  document.getElementById('mTitle').textContent=name;
+  document.getElementById('mSub').textContent=hen+' ／ 全'+q+'問';
+  document.getElementById('mMemo').value=rec.memo||'';
+  const con=document.getElementById('mRounds');
+  con.innerHTML='';
+  rounds.forEach((r,i)=>{
+    const d=document.createElement('div');
+    d.className='rblock';
+    const cVal=r.correct!==undefined?r.correct:'';
+    d.innerHTML='<div class="rbtitle"><span>'+(i+1)+'回目</span><span class="frac-preview" id="prev'+i+'">'+fracBadge(cVal,q)+'</span></div>'
+      +'<div class="frow"><span class="flabel">日付</span><input class="finput" type="date" id="d'+i+'" value="'+(r.date||'')+'"></div>'
+      +'<div class="frow"><span class="flabel">正答数</span><div style="display:flex;align-items:center;gap:8px;"><input class="finput narrow" type="number" id="cor'+i+'" min="0" max="'+q+'" placeholder="正答数" value="'+cVal+'"><span class="fixed-total">/ '+q+'問</span></div></div>';
+    con.appendChild(d);
+    setTimeout(()=>{
+      const corEl=document.getElementById('cor'+i);
+      const prevEl=document.getElementById('prev'+i);
+      corEl.addEventListener('input',()=>{prevEl.innerHTML=fracBadge(corEl.value,q);});
+    },0);
+  });
+  document.getElementById('ov').classList.add('open');
+}
+function closeModal(){document.getElementById('ov').classList.remove('open');editKey=null;}
+function saveModal(){
+  if(!editKey)return;
+  const rounds=[];
+  for(let i=0;i<5;i++){
+    const correct=document.getElementById('cor'+i).value;
+    const c=parseInt(correct);
+    const rate=(!isNaN(c)&&modalQ>0)?Math.round(c/modalQ*100):'';
+    rounds.push({date:document.getElementById('d'+i).value,correct,total:modalQ,rate});
+  }
+  DB[editKey]={rounds,memo:document.getElementById('mMemo').value};
+  saveDB();closeModal();buildAll();
+}
+function openExport(){
+  document.getElementById('expArea').value=JSON.stringify(DB,null,2);
+  document.getElementById('ovExp').classList.add('open');
+}
+function copyExport(){
+  const ta=document.getElementById('expArea');ta.select();
+  document.execCommand('copy');alert('コピーしました！');
+}
+function openImport(){
+  document.getElementById('impArea').value='';
+  document.getElementById('ovImp').classList.add('open');
+}
+function doImport(){
+  try{
+    DB=JSON.parse(document.getElementById('impArea').value);
+    saveDB();
+    document.getElementById('ovImp').classList.remove('open');
+    initGlobalGoal();buildAll();
+    alert('インポート完了しました！');
+  }catch(e){alert('データが正しくありません。');}
+}
+initGlobalGoal();
+buildAll();
+</script>
+</body>
+</html>
