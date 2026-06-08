@@ -2,37 +2,92 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>行政書士試験 学習管理アプリ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>行政書士試験 学習管理</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;padding:12px;}
-h1{font-size:15px;font-weight:500;margin-bottom:12px;color:#1a1a1a;}
-.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
-@media(max-width:540px){.summary-grid{grid-template-columns:repeat(2,1fr);}}
-.stat{background:#fff;border:0.5px solid #e0ddd5;border-radius:8px;padding:9px 11px;}
-.stat-label{font-size:10px;color:#666;margin-bottom:2px;}
-.stat-value{font-size:16px;font-weight:500;color:#1a1a1a;}
-.stat-value.sm{font-size:13px;}
-.prog-wrap{background:#fff;border:0.5px solid #e0ddd5;border-radius:8px;padding:10px 13px;margin-bottom:10px;}
-.prog-bg{background:#e8e6de;border-radius:4px;height:7px;margin-top:5px;}
-.prog-fill{background:#378ADD;border-radius:4px;height:7px;transition:width 0.4s;}
-.global-goal-wrap{background:#fff;border:0.5px solid #e0ddd5;border-radius:8px;padding:10px 13px;margin-bottom:10px;}
-.goal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
-.goal-title{font-size:12px;font-weight:500;color:#1a1a1a;}
-.goal-edit-btn{font-size:10px;padding:2px 8px;border-radius:6px;border:0.5px solid #ccc;background:#f5f5f3;color:#555;cursor:pointer;}
-.goal-text{font-size:12px;color:#444;line-height:1.6;white-space:pre-wrap;word-break:break-all;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku Gothic ProN',sans-serif;background:#F2F1ED;color:#1a1a1a;min-height:100vh;}
+
+/* ヘッダー */
+.app-header{background:#fff;padding:14px 16px 12px;border-bottom:0.5px solid #e0ddd5;position:sticky;top:0;z-index:10;}
+.app-header h1{font-size:15px;font-weight:600;color:#1a1a1a;}
+.app-header p{font-size:11px;color:#888;margin-top:1px;}
+
+.main{padding:12px 12px 80px;}
+
+/* サマリーカード */
+.summary-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.stat{background:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.stat-label{font-size:10px;color:#888;margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:0.03em;}
+.stat-value{font-size:22px;font-weight:700;color:#1a1a1a;line-height:1;}
+.stat-value.sm{font-size:17px;}
+.stat-sub{font-size:10px;color:#aaa;margin-top:3px;}
+
+/* 進捗バー */
+.prog-card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.prog-label{font-size:12px;color:#555;font-weight:500;}
+.prog-pct{font-size:14px;font-weight:700;color:#378ADD;}
+.prog-bg{background:#EEF0F2;border-radius:6px;height:8px;}
+.prog-fill{background:linear-gradient(90deg,#378ADD,#5BA0E8);border-radius:6px;height:8px;transition:width 0.5s ease;}
+
+/* カレンダー */
+.cal-card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cal-title{font-size:14px;font-weight:700;}
+.cal-nav-group{display:flex;align-items:center;gap:4px;}
+.cal-nav{width:32px;height:32px;border-radius:8px;border:0.5px solid #e0ddd5;background:#f5f5f3;color:#555;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.cal-today-btn{font-size:11px;padding:5px 10px;border-radius:8px;border:0.5px solid #e0ddd5;background:#f5f5f3;color:#555;cursor:pointer;font-weight:500;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;}
+.cal-dow{font-size:10px;color:#aaa;text-align:center;padding:2px 0;font-weight:500;}
+.cal-dow.sun{color:#E24B4A;}
+.cal-dow.sat{color:#378ADD;}
+.cal-cell{border-radius:8px;cursor:pointer;min-height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px;}
+.cal-cell:active{background:#f0f0ec;}
+.cal-cell.today .cal-day{background:#378ADD;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-cell.selected{background:#EEF6FF;outline:1.5px solid #378ADD;border-radius:8px;}
+.cal-day{font-size:12px;color:#1a1a1a;font-weight:500;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-day.sun{color:#E24B4A;}
+.cal-day.sat{color:#378ADD;}
+.cal-day.other{color:#ccc;}
+.cal-badge{font-size:9px;font-weight:600;padding:1px 4px;border-radius:6px;white-space:nowrap;}
+.cal-badge.hi100{background:#FCEBEB;color:#B91C1C;}
+.cal-badge.hi50{background:#EAF3DE;color:#166534;}
+.cal-badge.hi20{background:#FEF3C7;color:#92400E;}
+.cal-badge.lo{background:#EEF0FF;color:#3730A3;}
+.cal-detail{background:#F8F7F4;border-radius:10px;padding:10px 12px;display:none;}
+.cal-detail.show{display:block;}
+.cal-detail-title{font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:6px;}
+.cal-detail-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:5px 0;border-bottom:0.5px solid #E8E6E0;}
+.cal-detail-row:last-child{border-bottom:none;}
+.cal-detail-name{color:#444;flex:1;padding-right:8px;}
+.cal-detail-num{color:#888;white-space:nowrap;font-weight:500;}
+
+/* 全体目標 */
+.goal-card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.goal-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.goal-card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px;}
+.goal-edit-btn{font-size:11px;padding:5px 12px;border-radius:8px;border:0.5px solid #e0ddd5;background:#f5f5f3;color:#555;cursor:pointer;font-weight:500;}
+.goal-text{font-size:12px;color:#444;line-height:1.7;white-space:pre-wrap;word-break:break-all;}
 .goal-text.empty{color:#bbb;font-style:italic;}
-.goal-ta{width:100%;font-size:12px;padding:6px 8px;border:0.5px solid #ccc;border-radius:6px;background:#fff;color:#1a1a1a;resize:vertical;min-height:64px;font-family:inherit;line-height:1.6;}
-.goal-save-btn{margin-top:6px;font-size:11px;padding:4px 14px;border-radius:6px;border:none;background:#378ADD;color:#fff;cursor:pointer;}
-.top-btns{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
-.top-btn{font-size:11px;padding:5px 11px;border-radius:8px;border:0.5px solid #ccc;background:#fff;color:#555;cursor:pointer;}
-.top-btn:hover{background:#f0f0ec;}
-.sec-block{border:0.5px solid #e0ddd5;border-radius:12px;margin-bottom:8px;overflow:hidden;}
-.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer;background:#f5f5f3;}
-.sec-hdr:hover{background:#eeecea;}
-.sec-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
-.badge{font-size:10px;font-weight:500;padding:3px 7px;border-radius:7px;white-space:nowrap;flex-shrink:0;}
+.goal-ta{width:100%;font-size:13px;padding:10px 12px;border:1px solid #e0ddd5;border-radius:10px;background:#fff;color:#1a1a1a;resize:vertical;min-height:72px;font-family:inherit;line-height:1.6;}
+.goal-ta:focus{outline:none;border-color:#378ADD;}
+.goal-btn-row{display:flex;gap:8px;margin-top:8px;}
+.btn-primary{flex:1;font-size:13px;padding:10px;border-radius:10px;border:none;background:#378ADD;color:#fff;cursor:pointer;font-weight:600;}
+.btn-secondary{flex:1;font-size:13px;padding:10px;border-radius:10px;border:1px solid #e0ddd5;background:#fff;color:#555;cursor:pointer;font-weight:500;}
+
+/* 操作ボタン */
+.action-row{display:flex;gap:8px;margin-bottom:10px;}
+.action-btn{flex:1;font-size:12px;padding:10px 8px;border-radius:10px;border:0.5px solid #e0ddd5;background:#fff;color:#444;cursor:pointer;text-align:center;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+.action-btn:active{background:#f0f0ec;}
+
+/* 編ブロック */
+.sec-block{background:#fff;border-radius:14px;margin-bottom:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;cursor:pointer;user-select:none;}
+.sec-hdr:active{background:#f8f7f4;}
+.sec-left{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;}
+.sec-top-row{display:flex;align-items:center;gap:8px;}
+.badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0;}
 .h1{background:#EEEDFE;color:#3C3489;}
 .h2{background:#E6F1FB;color:#0C447C;}
 .h3{background:#E1F5EE;color:#085041;}
@@ -41,290 +96,296 @@ h1{font-size:15px;font-weight:500;margin-bottom:12px;color:#1a1a1a;}
 .h6{background:#FAEEDA;color:#633806;}
 .h7{background:#EAF3DE;color:#27500A;}
 .h8{background:#F1EFE8;color:#444441;}
-.sec-meta{font-size:10px;color:#888;white-space:nowrap;}
-.sec-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.mini-prog{width:50px;height:4px;background:#e0ddd5;border-radius:2px;}
-.mini-prog-fill{height:4px;border-radius:2px;background:#378ADD;}
-.chev{font-size:13px;color:#888;transition:transform 0.2s;display:inline-block;}
+.sec-meta{font-size:11px;color:#888;}
+.sec-prog-row{display:flex;align-items:center;gap:8px;}
+.sec-prog-bg{flex:1;height:4px;background:#EEF0F2;border-radius:3px;}
+.sec-prog-fill{height:4px;border-radius:3px;background:#378ADD;}
+.sec-pct{font-size:10px;color:#888;white-space:nowrap;min-width:28px;text-align:right;}
+.sec-right{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px;}
+.chev{font-size:14px;color:#bbb;transition:transform 0.2s;display:inline-block;}
 .chev.open{transform:rotate(180deg);}
-.sec-body{display:none;border-top:0.5px solid #e0ddd5;background:#fff;}
+.sec-body{display:none;border-top:0.5px solid #F0EDE6;}
 .sec-body.open{display:block;}
-.sec-goal-area{padding:8px 12px;border-bottom:0.5px solid #f0ede6;display:flex;align-items:flex-start;gap:8px;}
-.sec-goal-label{font-size:10px;color:#888;white-space:nowrap;padding-top:3px;flex-shrink:0;}
+
+/* 編目標 */
+.sec-goal-area{padding:10px 14px;border-bottom:0.5px solid #F5F3EE;display:flex;align-items:flex-start;gap:8px;background:#FAFAF8;}
+.sec-goal-label{font-size:10px;color:#aaa;white-space:nowrap;padding-top:2px;flex-shrink:0;font-weight:600;text-transform:uppercase;}
 .sec-goal-inner{flex:1;min-width:0;}
-.sec-goal-text{font-size:11px;color:#444;line-height:1.5;white-space:pre-wrap;word-break:break-all;cursor:pointer;}
-.sec-goal-text.empty{color:#bbb;font-style:italic;cursor:pointer;}
-.sec-goal-input{display:none;width:100%;font-size:11px;padding:4px 7px;border:0.5px solid #ccc;border-radius:6px;background:#fff;color:#1a1a1a;resize:none;font-family:inherit;line-height:1.5;min-height:44px;}
-.sec-goal-input.editing{display:block;}
+.sec-goal-text{font-size:12px;color:#555;line-height:1.5;white-space:pre-wrap;word-break:break-all;cursor:pointer;}
+.sec-goal-text.empty{color:#ccc;font-style:italic;}
 .sec-goal-text.editing{display:none;}
-.sec-goal-actions{display:none;gap:6px;margin-top:4px;}
+.sec-goal-input{display:none;width:100%;font-size:12px;padding:6px 8px;border:1px solid #e0ddd5;border-radius:8px;background:#fff;color:#1a1a1a;resize:none;font-family:inherit;line-height:1.5;min-height:48px;}
+.sec-goal-input:focus{outline:none;border-color:#378ADD;}
+.sec-goal-input.editing{display:block;}
+.sec-goal-actions{display:none;gap:6px;margin-top:6px;}
 .sec-goal-actions.editing{display:flex;}
-.sec-goal-sbtn{font-size:10px;padding:2px 10px;border-radius:5px;border:none;background:#378ADD;color:#fff;cursor:pointer;}
-.sec-goal-cbtn{font-size:10px;padding:2px 10px;border-radius:5px;border:0.5px solid #ccc;background:#fff;color:#555;cursor:pointer;}
-.tbl-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:12px;}
-thead th{background:#f5f5f3;color:#666;font-weight:500;font-size:10px;padding:5px 7px;text-align:center;border-bottom:0.5px solid #e0ddd5;border-right:0.5px solid #e0ddd5;white-space:nowrap;}
-thead th:last-child,td:last-child{border-right:none;}
-thead th.tl{text-align:left;}
-td{padding:5px 6px;border-bottom:0.5px solid #e0ddd5;border-right:0.5px solid #e0ddd5;vertical-align:middle;}
-tr:last-child td{border-bottom:none;}
-.tr{text-align:right;font-size:10px;color:#666;}
-.rounds-wrap{display:flex;gap:5px;flex-wrap:wrap;}
-.rchip{font-size:10px;display:flex;align-items:center;gap:2px;white-space:nowrap;}
-.rn{color:#888;}
-.rd{color:#1a1a1a;}
-.score-frac{font-size:10px;font-weight:500;padding:1px 4px;border-radius:9px;margin-left:2px;}
-.shi{background:#EAF3DE;color:#27500A;}
-.smi{background:#FAEEDA;color:#633806;}
-.slo{background:#FCEBEB;color:#791F1F;}
-.rec-btn{font-size:10px;padding:2px 6px;border-radius:5px;border:0.5px solid #ccc;background:#fff;color:#555;cursor:pointer;}
-.rec-btn:hover{background:#f5f5f3;}
-.ov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);align-items:flex-start;justify-content:center;padding:1.5rem 1rem;z-index:100;overflow-y:auto;}
+.sec-goal-sbtn{font-size:11px;padding:5px 14px;border-radius:7px;border:none;background:#378ADD;color:#fff;cursor:pointer;font-weight:600;}
+.sec-goal-cbtn{font-size:11px;padding:5px 14px;border-radius:7px;border:1px solid #e0ddd5;background:#fff;color:#555;cursor:pointer;}
+
+/* 単元リスト */
+.unit-list{padding:0 8px 8px;}
+.unit-item{border:0.5px solid #EEE;border-radius:10px;margin-top:6px;overflow:hidden;background:#fff;}
+.unit-item-top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;gap:8px;}
+.unit-name{font-size:12px;font-weight:500;color:#1a1a1a;flex:1;line-height:1.4;}
+.unit-q{font-size:11px;color:#888;white-space:nowrap;}
+.unit-rem{font-size:10px;color:#bbb;white-space:nowrap;}
+.rec-btn{font-size:11px;padding:6px 12px;border-radius:8px;border:0.5px solid #e0ddd5;background:#f5f5f3;color:#444;cursor:pointer;white-space:nowrap;font-weight:500;flex-shrink:0;}
+.rec-btn:active{background:#e8e6e0;}
+.rounds-row{display:flex;gap:4px;padding:0 12px 10px;flex-wrap:wrap;}
+.rchip{display:flex;align-items:center;gap:3px;background:#F5F5F3;border-radius:6px;padding:3px 6px;}
+.rn{font-size:10px;color:#aaa;font-weight:600;}
+.rd{font-size:10px;color:#555;}
+.score-frac{font-size:10px;font-weight:600;padding:1px 5px;border-radius:6px;margin-left:2px;}
+.shi{background:#EAF3DE;color:#166534;}
+.smi{background:#FEF3C7;color:#92400E;}
+.slo{background:#FCEBEB;color:#B91C1C;}
+
+/* モーダル */
+.ov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);align-items:flex-end;justify-content:center;z-index:100;}
 .ov.open{display:flex;}
-.modal{background:#fff;border-radius:12px;border:0.5px solid #e0ddd5;padding:1.1rem;width:100%;max-width:440px;margin-top:10px;}
-.mtitle{font-size:13px;font-weight:500;margin-bottom:3px;color:#1a1a1a;}
-.msub{font-size:11px;color:#666;margin-bottom:1rem;}
-.rblock{border:0.5px solid #e0ddd5;border-radius:8px;padding:8px 10px;margin-bottom:6px;}
-.rbtitle{font-size:11px;font-weight:500;color:#666;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
-.frow{display:grid;grid-template-columns:60px 1fr;gap:8px;align-items:center;margin-bottom:5px;}
+.modal{background:#fff;border-radius:20px 20px 0 0;padding:0;width:100%;max-height:92vh;overflow-y:auto;}
+.modal-handle{width:36px;height:4px;background:#e0ddd5;border-radius:2px;margin:10px auto 0;}
+.modal-inner{padding:16px 16px 40px;}
+.mtitle{font-size:15px;font-weight:700;margin-bottom:3px;}
+.msub{font-size:12px;color:#888;margin-bottom:14px;}
+.rblock{border:1px solid #EEE;border-radius:12px;padding:12px 14px;margin-bottom:8px;}
+.rbtitle{font-size:12px;font-weight:700;color:#555;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.frow{display:grid;grid-template-columns:64px 1fr;gap:8px;align-items:center;margin-bottom:8px;}
 .frow:last-child{margin-bottom:0;}
-.flabel{font-size:11px;color:#666;}
-.finput{font-size:12px;padding:5px 7px;border:0.5px solid #ccc;border-radius:6px;background:#fff;color:#1a1a1a;width:100%;}
-.finput.narrow{width:70px;}
-.fixed-total{font-size:12px;color:#888;font-weight:500;}
-.frac-preview{font-size:11px;font-weight:500;}
-.memo-ta{width:100%;font-size:12px;padding:6px 8px;border:0.5px solid #ccc;border-radius:6px;background:#fff;color:#1a1a1a;resize:vertical;min-height:52px;font-family:inherit;}
-.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;}
-.bsave{font-size:12px;padding:6px 16px;border-radius:6px;border:none;background:#378ADD;color:#fff;cursor:pointer;}
-.bcancel{font-size:12px;padding:6px 16px;border-radius:6px;border:0.5px solid #ccc;background:#fff;color:#555;cursor:pointer;}
-.data-area{font-size:11px;padding:7px;border:0.5px solid #ccc;border-radius:6px;width:100%;min-height:80px;font-family:monospace;resize:vertical;color:#1a1a1a;background:#f9f9f7;}
-.notice{font-size:11px;color:#666;margin-top:5px;}
+.flabel{font-size:12px;color:#666;font-weight:500;}
+.finput{font-size:14px;padding:10px 12px;border:1px solid #e0ddd5;border-radius:10px;background:#fff;color:#1a1a1a;width:100%;}
+.finput:focus{outline:none;border-color:#378ADD;}
+.finput.narrow{width:80px;}
+.fixed-total{font-size:13px;color:#888;font-weight:500;}
+.frac-preview{font-size:12px;font-weight:700;}
+.memo-label{font-size:12px;font-weight:600;color:#555;margin-bottom:6px;margin-top:10px;}
+.memo-ta{width:100%;font-size:13px;padding:10px 12px;border:1px solid #e0ddd5;border-radius:10px;background:#fff;color:#1a1a1a;resize:vertical;min-height:64px;font-family:inherit;}
+.memo-ta:focus{outline:none;border-color:#378ADD;}
+.modal-btn-row{display:flex;gap:8px;margin-top:14px;}
+
+/* データ用モーダル */
+.data-area{font-size:12px;padding:10px;border:1px solid #e0ddd5;border-radius:10px;width:100%;min-height:100px;font-family:monospace;resize:vertical;color:#1a1a1a;background:#F8F7F4;}
+.notice{font-size:11px;color:#888;margin-top:6px;}
 </style>
 </head>
 <body>
-<h1>&#128218; 行政書士試験 学習管理アプリ</h1>
-<div class="summary-grid">
-  <div class="stat"><div class="stat-label">総問題数</div><div class="stat-value" id="sTotal">―</div></div>
-  <div class="stat"><div class="stat-label">完了問題数</div><div class="stat-value sm" id="sDone">0問</div></div>
-  <div class="stat"><div class="stat-label">平均正答率</div><div class="stat-value" id="sRate">―</div></div>
-  <div class="stat"><div class="stat-label">回転数</div><div class="stat-value sm" id="sComp">0回転</div></div>
+
+<div class="app-header">
+  <h1>&#128218; 行政書士試験 学習管理</h1>
+  <p id="headerSub">読み込み中...</p>
 </div>
-<div class="prog-wrap">
-  <div style="display:flex;justify-content:space-between;">
-    <span style="font-size:11px;color:#666;">学習進捗（1回目完了ベース）</span>
-    <span style="font-size:11px;font-weight:500;" id="sPct">0%</span>
+
+<div class="main">
+
+<!-- サマリー -->
+<div class="summary-row">
+  <div class="stat">
+    <div class="stat-label">総問題数</div>
+    <div class="stat-value sm" id="sTotal">―</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">完了問題数</div>
+    <div class="stat-value sm" id="sDone">0問</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">平均正答率</div>
+    <div class="stat-value" id="sRate">―</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">回転数</div>
+    <div class="stat-value sm" id="sComp">0回転</div>
+  </div>
+</div>
+
+<!-- 進捗 -->
+<div class="prog-card">
+  <div class="prog-row">
+    <span class="prog-label">学習進捗（1回目完了ベース）</span>
+    <span class="prog-pct" id="sPct">0%</span>
   </div>
   <div class="prog-bg"><div class="prog-fill" id="sBar" style="width:0%;"></div></div>
 </div>
-<div class="global-goal-wrap">
-  <div class="goal-header">
-    <div class="goal-title">&#127945; 全体目標</div>
+
+<!-- カレンダー -->
+<div class="cal-card">
+  <div class="cal-header">
+    <span class="cal-title" id="calTitle"></span>
+    <div class="cal-nav-group">
+      <button class="cal-nav" onclick="calPrev()">&#8249;</button>
+      <button class="cal-nav" onclick="calNext()">&#8250;</button>
+      <button class="cal-today-btn" onclick="calGoToday()">今日</button>
+    </div>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div class="cal-detail" id="calDetail"></div>
+</div>
+
+<!-- 全体目標 -->
+<div class="goal-card">
+  <div class="goal-card-header">
+    <div class="goal-card-title">&#127945; 全体目標</div>
     <button class="goal-edit-btn" id="gGoalBtn" onclick="toggleGlobalGoal()">編集</button>
   </div>
   <div id="gGoalText" class="goal-text empty">目標を入力してください...</div>
   <textarea class="goal-ta" id="gGoalTa" style="display:none;" placeholder="例）2025年11月の試験で合格！1日50問ペースで進める。"></textarea>
-  <div id="gGoalActions" style="display:none;">
-    <button class="goal-save-btn" onclick="saveGlobalGoal()">保存</button>
-    <button class="goal-save-btn" onclick="cancelGlobalGoal()" style="background:#ccc;margin-left:6px;">キャンセル</button>
+  <div id="gGoalActions" style="display:none;" class="goal-btn-row">
+    <button class="btn-secondary" onclick="cancelGlobalGoal()">キャンセル</button>
+    <button class="btn-primary" onclick="saveGlobalGoal()">保存</button>
   </div>
 </div>
-<div class="top-btns">
-  <button class="top-btn" id="taBtn" onclick="toggleAll()">&#9660; すべて展開</button>
-  <button class="top-btn" onclick="openExport()">&#8659; エクスポート</button>
-  <button class="top-btn" onclick="openImport()">&#8657; インポート</button>
+
+<!-- 操作ボタン -->
+<div class="action-row">
+  <button class="action-btn" id="taBtn" onclick="toggleAll()">&#9660; すべて展開</button>
+  <button class="action-btn" onclick="openExport()">&#8659; エクスポート</button>
+  <button class="action-btn" onclick="openImport()">&#8657; インポート</button>
 </div>
+
 <div id="secContainer"></div>
+</div>
 
-<div class="ov" id="ov">
+<!-- 記録モーダル -->
+<div class="ov" id="ov" onclick="ovClose(event,'ov')">
 <div class="modal">
-  <div class="mtitle" id="mTitle"></div>
-  <div class="msub" id="mSub"></div>
-  <div id="mRounds"></div>
-  <div style="margin-top:8px;">
-    <div style="font-size:11px;font-weight:500;color:#666;margin-bottom:3px;">メモ</div>
+  <div class="modal-handle"></div>
+  <div class="modal-inner">
+    <div class="mtitle" id="mTitle"></div>
+    <div class="msub" id="mSub"></div>
+    <div id="mRounds"></div>
+    <div class="memo-label">&#128203; メモ</div>
     <textarea class="memo-ta" id="mMemo" placeholder="気づき・苦手ポイントなど..."></textarea>
-  </div>
-  <div class="mbtns">
-    <button class="bcancel" onclick="closeModal()">キャンセル</button>
-    <button class="bsave" onclick="saveModal()">保存</button>
-  </div>
-</div>
-</div>
-
-<div class="ov" id="ovExp">
-<div class="modal">
-  <div class="mtitle">データをエクスポート</div>
-  <div class="msub" style="margin-bottom:8px;">下のテキストをコピーして保存してください。</div>
-  <textarea class="data-area" id="expArea" readonly></textarea>
-  <div class="mbtns">
-    <button class="bcancel" onclick="document.getElementById('ovExp').classList.remove('open')">閉じる</button>
-    <button class="bsave" onclick="copyExport()">コピー</button>
+    <div class="modal-btn-row">
+      <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
+      <button class="btn-primary" onclick="saveModal()">保存</button>
+    </div>
   </div>
 </div>
 </div>
 
-<div class="ov" id="ovImp">
+<!-- エクスポート -->
+<div class="ov" id="ovExp" onclick="ovClose(event,'ovExp')">
 <div class="modal">
-  <div class="mtitle">データをインポート</div>
-  <div class="msub" style="margin-bottom:8px;">エクスポートしたテキストを貼り付けてください。現在のデータは上書きされます。</div>
-  <textarea class="data-area" id="impArea" placeholder="ここにエクスポートデータを貼り付け..."></textarea>
-  <div class="notice">※ 貼り付け後「インポート実行」を押してください</div>
-  <div class="mbtns">
-    <button class="bcancel" onclick="document.getElementById('ovImp').classList.remove('open')">キャンセル</button>
-    <button class="bsave" onclick="doImport()">インポート実行</button>
+  <div class="modal-handle"></div>
+  <div class="modal-inner">
+    <div class="mtitle">エクスポート</div>
+    <div class="msub">テキストをコピーして保存してください</div>
+    <textarea class="data-area" id="expArea" readonly></textarea>
+    <div class="modal-btn-row">
+      <button class="btn-secondary" onclick="document.getElementById('ovExp').classList.remove('open')">閉じる</button>
+      <button class="btn-primary" onclick="copyExport()">コピー</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- インポート -->
+<div class="ov" id="ovImp" onclick="ovClose(event,'ovImp')">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-inner">
+    <div class="mtitle">インポート</div>
+    <div class="msub">エクスポートしたテキストを貼り付けてください</div>
+    <textarea class="data-area" id="impArea" placeholder="ここに貼り付け..."></textarea>
+    <div class="notice">※ 貼り付け後「インポート実行」を押してください</div>
+    <div class="modal-btn-row">
+      <button class="btn-secondary" onclick="document.getElementById('ovImp').classList.remove('open')">キャンセル</button>
+      <button class="btn-primary" onclick="doImport()">インポート実行</button>
+    </div>
   </div>
 </div>
 </div>
 
 <script>
-const SECS=[
+var SECS=[
   {hen:"第１編 憲法",hc:"h1",units:[
-    {name:"憲法総論(1) 憲法とは",q:3},
-    {name:"人権(1) 人権総論",q:29},
-    {name:"人権(2) 包括的基本権",q:19},
-    {name:"人権(3) 法の下の平等",q:16},
-    {name:"人権(4) 精神的自由",q:37},
-    {name:"人権(5) 経済的自由",q:13},
-    {name:"人権(6) 人身の自由",q:20},
-    {name:"人権(7) 受益権",q:7},
-    {name:"人権(8) 参政権",q:6},
-    {name:"人権(9) 社会権",q:16},
-    {name:"統治(1) 統治総論",q:1},
-    {name:"統治(2) 天皇",q:15},
-    {name:"統治(3) 国会",q:47},
-    {name:"統治(4) 内閣",q:36},
-    {name:"統治(5) 裁判所",q:39},
-    {name:"統治(6) 財政",q:19},
-    {name:"統治(7) 地方自治",q:9},
-    {name:"統治(8) 憲法改正等",q:8}]},
+    {name:"憲法総論(1) 憲法とは",q:3},{name:"人権(1) 人権総論",q:29},{name:"人権(2) 包括的基本権",q:19},
+    {name:"人権(3) 法の下の平等",q:16},{name:"人権(4) 精神的自由",q:37},{name:"人権(5) 経済的自由",q:13},
+    {name:"人権(6) 人身の自由",q:20},{name:"人権(7) 受益権",q:7},{name:"人権(8) 参政権",q:6},
+    {name:"人権(9) 社会権",q:16},{name:"統治(1) 統治総論",q:1},{name:"統治(2) 天皇",q:15},
+    {name:"統治(3) 国会",q:47},{name:"統治(4) 内閣",q:36},{name:"統治(5) 裁判所",q:39},
+    {name:"統治(6) 財政",q:19},{name:"統治(7) 地方自治",q:9},{name:"統治(8) 憲法改正等",q:8}]},
   {hen:"第２編 民法",hc:"h2",units:[
-    {name:"総則(1) 民法序論",q:2},
-    {name:"総則(2) 権利の主体",q:52},
-    {name:"総則(3) 権利の客体",q:5},
-    {name:"総則(4) 法律行為",q:3},
-    {name:"総則(5) 意思表示",q:40},
-    {name:"総則(6) 代理",q:40},
-    {name:"総則(7) 条件・期限・期間",q:15},
-    {name:"総則(8) 時効",q:25},
-    {name:"物権(1) 物権",q:4},
-    {name:"物権(2) 物権変動",q:54},
-    {name:"物権(3) 占有権",q:13},
-    {name:"物権(4) 所有権",q:35},
-    {name:"物権(5) 用益物権",q:10},
-    {name:"物権(6) 担保物権",q:108},
-    {name:"債権総論(1) 総説",q:10},
-    {name:"債権総論(2) 債権の効力",q:44},
-    {name:"債権総論(3) 多数当事者間の債権債務関係",q:38},
-    {name:"債権総論(4) 債権譲渡",q:17},
-    {name:"債権総論(5) 債権の消滅",q:36},
-    {name:"債権各論(1) 契約総論",q:30},
-    {name:"債権各論(2) 契約各論",q:157},
-    {name:"債権各論(3) 契約以外の法律関係",q:80},
-    {name:"家族法(1) 親族",q:74},
-    {name:"家族法(2) 相続",q:73}]},
+    {name:"総則(1) 民法序論",q:2},{name:"総則(2) 権利の主体",q:52},{name:"総則(3) 権利の客体",q:5},
+    {name:"総則(4) 法律行為",q:3},{name:"総則(5) 意思表示",q:40},{name:"総則(6) 代理",q:40},
+    {name:"総則(7) 条件・期限・期間",q:15},{name:"総則(8) 時効",q:25},{name:"物権(1) 物権",q:4},
+    {name:"物権(2) 物権変動",q:54},{name:"物権(3) 占有権",q:13},{name:"物権(4) 所有権",q:35},
+    {name:"物権(5) 用益物権",q:10},{name:"物権(6) 担保物権",q:108},{name:"債権総論(1) 総説",q:10},
+    {name:"債権総論(2) 債権の効力",q:44},{name:"債権総論(3) 多数当事者間の債権債務関係",q:38},
+    {name:"債権総論(4) 債権譲渡",q:17},{name:"債権総論(5) 債権の消滅",q:36},
+    {name:"債権各論(1) 契約総論",q:30},{name:"債権各論(2) 契約各論",q:157},
+    {name:"債権各論(3) 契約以外の法律関係",q:80},{name:"家族法(1) 親族",q:74},{name:"家族法(2) 相続",q:73}]},
   {hen:"第３編 行政法",hc:"h3",units:[
-    {name:"行政法総論(1) 総説",q:26},
-    {name:"行政法総論(2) 行政組織",q:49},
-    {name:"行政法総論(3) 行政立法",q:26},
-    {name:"行政法総論(4) 行政行為",q:87},
-    {name:"行政法総論(5) 行政契約・行政指導",q:18},
-    {name:"行政法総論(6) 行政計画",q:2},
-    {name:"行政法総論(7) 行政上の強制手段",q:47},
-    {name:"行政法総論(8) 行政調査",q:11},
-    {name:"行政手続法(1) 総説",q:23},
-    {name:"行政手続法(2) 申請に対する処分",q:34},
-    {name:"行政手続法(3) 不利益処分",q:53},
-    {name:"行政手続法(4) 行政指導・届出",q:32},
-    {name:"行政手続法(5) 命令等を定める手続",q:24},
-    {name:"行政不服審査法(1) 総説",q:10},
-    {name:"行政不服審査法(2) 要件",q:13},
-    {name:"行政不服審査法(3) 審理手続等",q:64},
-    {name:"行政事件訴訟法(1) 取消訴訟",q:131},
-    {name:"行政事件訴訟法(2) その他の訴訟",q:65},
-    {name:"国家賠償法(1) 1条",q:39},
-    {name:"国家賠償法(2) 2条",q:9},
-    {name:"国家賠償法(3) 3条以下",q:17},
-    {name:"損失補償(1) 損失補償",q:11},
-    {name:"地方自治法(1) 総説",q:24},
-    {name:"地方自治法(2) 機関",q:29},
-    {name:"地方自治法(3) 住民",q:54},
-    {name:"地方自治法(4) 条例・規則",q:9},
-    {name:"地方自治法(5) 財務",q:9},
-    {name:"地方自治法(6) 関与",q:9},
-    {name:"地方自治法(7) 係争処理手続",q:5}]},
+    {name:"行政法総論(1) 総説",q:26},{name:"行政法総論(2) 行政組織",q:49},{name:"行政法総論(3) 行政立法",q:26},
+    {name:"行政法総論(4) 行政行為",q:87},{name:"行政法総論(5) 行政契約・行政指導",q:18},
+    {name:"行政法総論(6) 行政計画",q:2},{name:"行政法総論(7) 行政上の強制手段",q:47},
+    {name:"行政法総論(8) 行政調査",q:11},{name:"行政手続法(1) 総説",q:23},
+    {name:"行政手続法(2) 申請に対する処分",q:34},{name:"行政手続法(3) 不利益処分",q:53},
+    {name:"行政手続法(4) 行政指導・届出",q:32},{name:"行政手続法(5) 命令等を定める手続",q:24},
+    {name:"行政不服審査法(1) 総説",q:10},{name:"行政不服審査法(2) 要件",q:13},
+    {name:"行政不服審査法(3) 審理手続等",q:64},{name:"行政事件訴訟法(1) 取消訴訟",q:131},
+    {name:"行政事件訴訟法(2) その他の訴訟",q:65},{name:"国家賠償法(1) 1条",q:39},
+    {name:"国家賠償法(2) 2条",q:9},{name:"国家賠償法(3) 3条以下",q:17},
+    {name:"損失補償(1) 損失補償",q:11},{name:"地方自治法(1) 総説",q:24},
+    {name:"地方自治法(2) 機関",q:29},{name:"地方自治法(3) 住民",q:54},
+    {name:"地方自治法(4) 条例・規則",q:9},{name:"地方自治法(5) 財務",q:9},
+    {name:"地方自治法(6) 関与",q:9},{name:"地方自治法(7) 係争処理手続",q:5}]},
   {hen:"第４編 商法・会社法",hc:"h4",units:[
-    {name:"商法(1) 商法",q:45},
-    {name:"会社法(1) 設立",q:29},
-    {name:"会社法(2) 株式",q:15},
-    {name:"会社法(3) 機関",q:51},
-    {name:"会社法(4) 計算",q:5},
-    {name:"会社法(5) 持分会社",q:5}]},
+    {name:"商法(1) 商法",q:45},{name:"会社法(1) 設立",q:29},{name:"会社法(2) 株式",q:15},
+    {name:"会社法(3) 機関",q:51},{name:"会社法(4) 計算",q:5},{name:"会社法(5) 持分会社",q:5}]},
   {hen:"第５編 基礎法学",hc:"h5",units:[
-    {name:"法とは何か(1) 法とは何か",q:36},
-    {name:"紛争解決と司法制度(1) 紛争解決と司法制度",q:38},
+    {name:"法とは何か(1) 法とは何か",q:36},{name:"紛争解決と司法制度(1) 紛争解決と司法制度",q:38},
     {name:"法令用語等(1) 法令用語等",q:26}]},
   {hen:"第６編 行政書士業務関連諸法令",hc:"h6",units:[
-    {name:"行政書士法(1) 行政書士法",q:75},
-    {name:"その他諸法令(1) 戸籍法",q:34},
+    {name:"行政書士法(1) 行政書士法",q:75},{name:"その他諸法令(1) 戸籍法",q:34},
     {name:"その他諸法令(2) 住民基本台帳法",q:16}]},
   {hen:"第７編 一般知識（政治・経済・社会）",hc:"h7",units:[
-    {name:"政治(1) 政治",q:80},
-    {name:"経済(1) 経済",q:23},
-    {name:"社会(1) 社会",q:37}]},
+    {name:"政治(1) 政治",q:80},{name:"経済(1) 経済",q:23},{name:"社会(1) 社会",q:37}]},
   {hen:"第８編 情報通信・個人情報保護",hc:"h8",units:[
-    {name:"情報通信(1) 情報の公開",q:4},
-    {name:"情報通信(2) 用語",q:26},
+    {name:"情報通信(1) 情報の公開",q:4},{name:"情報通信(2) 用語",q:26},
     {name:"個人情報保護(1) 個人情報保護法",q:20}]}
 ];
 
-const TOTAL=SECS.reduce((a,s)=>a+s.units.reduce((b,u)=>b+u.q,0),0);
-const flatUnits=[];
-SECS.forEach(s=>{
-  const secTotal=s.units.reduce((a,u)=>a+u.q,0);
-  let secCumul=0;
-  s.units.forEach(u=>{
-    secCumul+=u.q;
-    flatUnits.push({...u,hen:s.hen,remaining:secTotal-secCumul});
-  });
+var TOTAL=SECS.reduce(function(a,s){return a+s.units.reduce(function(b,u){return b+u.q;},0);},0);
+var flatUnits=[];
+SECS.forEach(function(s){
+  var st=s.units.reduce(function(a,u){return a+u.q;},0);
+  var sc=0;
+  s.units.forEach(function(u){sc+=u.q;flatUnits.push({name:u.name,q:u.q,hen:s.hen,remaining:st-sc});});
 });
 
-let DB={};
+var DB={};
 try{DB=JSON.parse(localStorage.getItem('gyosei_app')||'{}');}catch(e){}
 function saveDB(){try{localStorage.setItem('gyosei_app',JSON.stringify(DB));}catch(e){}}
 function getKey(hen,name){return hen+'\x01'+name;}
 function getRec(hen,name){return DB[getKey(hen,name)]||{rounds:[{},{},{},{},{}],memo:''};}
-function getGoalKey(hen){return '__goal__'+hen;}
-function getGoal(hen){return DB[getGoalKey(hen)]||'';}
-function setGoal(hen,val){DB[getGoalKey(hen)]=val;saveDB();}
-const GLOBAL_GOAL_KEY='__global_goal__';
-function getGlobalGoal(){return DB[GLOBAL_GOAL_KEY]||'';}
-function setGlobalGoal(val){DB[GLOBAL_GOAL_KEY]=val;saveDB();}
+function getGoal(hen){return DB['__goal__'+hen]||'';}
+function setGoal(hen,val){DB['__goal__'+hen]=val;saveDB();}
+function getGlobalGoal(){return DB['__global_goal__']||'';}
+function setGlobalGoal(val){DB['__global_goal__']=val;saveDB();}
 
 function initGlobalGoal(){
-  const val=getGlobalGoal();
-  const el=document.getElementById('gGoalText');
+  var val=getGlobalGoal(),el=document.getElementById('gGoalText');
   if(val){el.textContent=val;el.classList.remove('empty');}
   else{el.textContent='目標を入力してください...';el.classList.add('empty');}
 }
 function toggleGlobalGoal(){
-  const ta=document.getElementById('gGoalTa');
-  const actions=document.getElementById('gGoalActions');
-  const btn=document.getElementById('gGoalBtn');
-  const text=document.getElementById('gGoalText');
-  const editing=ta.style.display==='none';
-  if(editing){ta.value=getGlobalGoal();ta.style.display='block';actions.style.display='block';text.style.display='none';btn.textContent='閉じる';ta.focus();}
-  else{ta.style.display='none';actions.style.display='none';text.style.display='block';btn.textContent='編集';}
+  var ta=document.getElementById('gGoalTa'),ac=document.getElementById('gGoalActions'),
+      btn=document.getElementById('gGoalBtn'),tx=document.getElementById('gGoalText');
+  if(ta.style.display==='none'){
+    ta.value=getGlobalGoal();ta.style.display='block';ac.style.display='flex';
+    tx.style.display='none';btn.textContent='閉じる';ta.focus();
+  } else {
+    ta.style.display='none';ac.style.display='none';tx.style.display='block';btn.textContent='編集';
+  }
 }
 function saveGlobalGoal(){
-  const val=document.getElementById('gGoalTa').value.trim();
+  var val=document.getElementById('gGoalTa').value.trim(),el=document.getElementById('gGoalText');
   setGlobalGoal(val);
-  const el=document.getElementById('gGoalText');
   if(val){el.textContent=val;el.classList.remove('empty');}
   else{el.textContent='目標を入力してください...';el.classList.add('empty');}
   document.getElementById('gGoalTa').style.display='none';
   document.getElementById('gGoalActions').style.display='none';
-  el.style.display='block';
-  document.getElementById('gGoalBtn').textContent='編集';
+  el.style.display='block';document.getElementById('gGoalBtn').textContent='編集';
 }
 function cancelGlobalGoal(){
   document.getElementById('gGoalTa').style.display='none';
@@ -333,41 +394,37 @@ function cancelGlobalGoal(){
   document.getElementById('gGoalBtn').textContent='編集';
 }
 function startEditSecGoal(si){
-  const text=document.getElementById('sgText'+si);
-  const input=document.getElementById('sgInput'+si);
-  const actions=document.getElementById('sgActions'+si);
-  input.value=getGoal(SECS[si].hen);
-  text.classList.add('editing');input.classList.add('editing');actions.classList.add('editing');input.focus();
+  var tx=document.getElementById('sgText'+si),inp=document.getElementById('sgInput'+si),ac=document.getElementById('sgActions'+si);
+  inp.value=getGoal(SECS[si].hen);
+  tx.classList.add('editing');inp.classList.add('editing');ac.classList.add('editing');inp.focus();
 }
 function saveSecGoal(si){
-  const input=document.getElementById('sgInput'+si);
-  const text=document.getElementById('sgText'+si);
-  const actions=document.getElementById('sgActions'+si);
-  const val=input.value.trim();
-  setGoal(SECS[si].hen,val);
-  if(val){text.textContent=val;text.classList.remove('empty');}
-  else{text.textContent='この編の目標を入力...';text.classList.add('empty');}
-  text.classList.remove('editing');input.classList.remove('editing');actions.classList.remove('editing');
+  var inp=document.getElementById('sgInput'+si),tx=document.getElementById('sgText'+si),ac=document.getElementById('sgActions'+si);
+  var val=inp.value.trim();setGoal(SECS[si].hen,val);
+  if(val){tx.textContent=val;tx.classList.remove('empty');}
+  else{tx.textContent='この編の目標を入力...';tx.classList.add('empty');}
+  tx.classList.remove('editing');inp.classList.remove('editing');ac.classList.remove('editing');
 }
 function cancelSecGoal(si){
   document.getElementById('sgText'+si).classList.remove('editing');
   document.getElementById('sgInput'+si).classList.remove('editing');
   document.getElementById('sgActions'+si).classList.remove('editing');
 }
+
 function fracBadge(correct,total){
-  if(correct===''||correct===null||correct===undefined)return'';
-  const c=parseInt(correct),t=parseInt(total);
-  if(isNaN(c)||isNaN(t)||t===0)return'';
-  const rate=c/t;
-  const pct=Math.round(rate*100);
-  const cls=rate>=0.8?'shi':rate>=0.6?'smi':'slo';
-  return'<span class="score-frac '+cls+'">'+pct+'%</span>';
+  if(correct===''||correct===null||correct===undefined)return '';
+  var c=parseInt(correct),t=parseInt(total);
+  if(isNaN(c)||isNaN(t)||t===0)return '';
+  var rate=c/t,pct=Math.round(rate*100);
+  var cls=rate>=0.8?'shi':rate>=0.6?'smi':'slo';
+  return '<span class="score-frac '+cls+'">'+pct+'%</span>';
 }
-let expanded=false;
-let modalQ=0;
+
+var expanded=false,modalQ=0;
+
 function toggleAll(){
   expanded=!expanded;
-  SECS.forEach((_,i)=>{
+  SECS.forEach(function(_,i){
     document.getElementById('body'+i).classList.toggle('open',expanded);
     document.getElementById('chev'+i).classList.toggle('open',expanded);
   });
@@ -377,188 +434,215 @@ function toggleSec(i){
   document.getElementById('body'+i).classList.toggle('open');
   document.getElementById('chev'+i).classList.toggle('open');
 }
+
 function buildAll(){
   document.getElementById('sTotal').textContent=TOTAL.toLocaleString()+'問';
-  const con=document.getElementById('secContainer');
+  var con=document.getElementById('secContainer');
   con.innerHTML='';
-  SECS.forEach((sec,si)=>{
-    const div=document.createElement('div');
-    div.className='sec-block';
-    const hdr=document.createElement('div');
-    hdr.className='sec-hdr';
-    hdr.onclick=()=>toggleSec(si);
-    hdr.innerHTML='<div class="sec-left"><span class="badge '+sec.hc+'">'+sec.hen+'</span>'
-      +'<span class="sec-meta" id="meta'+si+'"></span></div>'
-      +'<div class="sec-right"><div class="mini-prog"><div class="mini-prog-fill" id="mpf'+si+'" style="width:0%;"></div></div>'
-      +'<span class="chev" id="chev'+si+'">&#9660;</span></div>';
+  SECS.forEach(function(sec,si){
+    var div=document.createElement('div');div.className='sec-block';
+    // ヘッダー
+    var hdr=document.createElement('div');hdr.className='sec-hdr';
+    hdr.onclick=(function(i){return function(){toggleSec(i);};})(si);
+    hdr.innerHTML='<div class="sec-left">'
+      +'<div class="sec-top-row"><span class="badge '+sec.hc+'">'+sec.hen+'</span></div>'
+      +'<div class="sec-prog-row"><div class="sec-prog-bg"><div class="sec-prog-fill" id="mpf'+si+'" style="width:0%;"></div></div>'
+      +'<span class="sec-pct" id="meta'+si+'">0/0問</span></div>'
+      +'</div>'
+      +'<span class="chev" id="chev'+si+'">&#9660;</span>';
     div.appendChild(hdr);
-    const body=document.createElement('div');
-    body.className='sec-body';
-    body.id='body'+si;
-    const goalArea=document.createElement('div');
-    goalArea.className='sec-goal-area';
-    const goalLabel=document.createElement('div');
-    goalLabel.className='sec-goal-label';
-    goalLabel.textContent='目標';
-    const goalInner=document.createElement('div');
-    goalInner.className='sec-goal-inner';
-    const goalVal=getGoal(sec.hen);
-    const goalText=document.createElement('div');
-    goalText.className='sec-goal-text'+(goalVal?'':' empty');
-    goalText.id='sgText'+si;
-    goalText.textContent=goalVal||'この編の目標を入力...';
-    goalText.onclick=()=>startEditSecGoal(si);
-    const goalInput=document.createElement('textarea');
-    goalInput.className='sec-goal-input';
-    goalInput.id='sgInput'+si;
-    goalInput.placeholder='例）○月○日までに1回転完了。正答率80%以上を目指す。';
-    goalInput.rows=2;
-    const goalActions=document.createElement('div');
-    goalActions.className='sec-goal-actions';
-    goalActions.id='sgActions'+si;
-    goalActions.innerHTML='<button class="sec-goal-sbtn" onclick="saveSecGoal('+si+')">保存</button>'
-      +'<button class="sec-goal-cbtn" onclick="cancelSecGoal('+si+')">キャンセル</button>';
-    goalInner.appendChild(goalText);goalInner.appendChild(goalInput);goalInner.appendChild(goalActions);
-    goalArea.appendChild(goalLabel);goalArea.appendChild(goalInner);
-    body.appendChild(goalArea);
-    const tblWrap=document.createElement('div');
-    tblWrap.className='tbl-wrap';
-    const tbl=document.createElement('table');
-    tbl.innerHTML='<thead><tr><th class="tl" style="min-width:120px;">単元</th><th style="width:40px;">問題数</th><th style="width:58px;">残り</th><th class="tl">1〜5回目</th><th style="width:44px;"></th></tr></thead>';
-    const tbody=document.createElement('tbody');
-    sec.units.forEach(u=>{
-      const rec=getRec(sec.hen,u.name);
-      const rounds=rec.rounds||[];
-      while(rounds.length<5)rounds.push({});
-      const fu=flatUnits.find(x=>x.hen===sec.hen&&x.name===u.name);
-      const rem=fu?fu.remaining:0;
-      const chips=rounds.map((r,i)=>'<span class="rchip"><span class="rn">'+(i+1)+'.</span><span class="rd">'+(r.date||'―')+'</span>'+fracBadge(r.correct,u.q)+'</span>').join('');
-      const hasMemo=rec.memo&&rec.memo.trim();
-      const k=getKey(sec.hen,u.name);
-      const tr=document.createElement('tr');
-      tr.innerHTML='<td style="font-size:11px;">'+u.name+(hasMemo?'<span style="font-size:9px;color:#aaa;margin-left:2px;">&#128203;</span>':'')+'</td>'
-        +'<td style="text-align:right;font-size:11px;">'+u.q+'問</td>'
-        +'<td class="tr">あと'+rem.toLocaleString()+'問</td>'
-        +'<td style="padding:3px 5px;"><div class="rounds-wrap">'+chips+'</div></td>'
-        +'<td style="text-align:center;padding:3px 4px;"><button class="rec-btn" data-key="'+k+'" data-q="'+u.q+'">&#9998; 記録</button></td>';
-      tbody.appendChild(tr);
+    // ボディ
+    var body=document.createElement('div');body.className='sec-body';body.id='body'+si;
+    // 編目標
+    var gval=getGoal(sec.hen);
+    var ga=document.createElement('div');ga.className='sec-goal-area';
+    ga.innerHTML='<span class="sec-goal-label">目標</span>'
+      +'<div class="sec-goal-inner">'
+      +'<div class="sec-goal-text'+(gval?'':' empty')+'" id="sgText'+si+'" onclick="startEditSecGoal('+si+')">'+(gval||'この編の目標を入力...')+'</div>'
+      +'<textarea class="sec-goal-input" id="sgInput'+si+'" rows="2" placeholder="例）○月○日までに1回転完了。正答率80%以上を目指す。"></textarea>'
+      +'<div class="sec-goal-actions" id="sgActions'+si+'">'
+      +'<button class="sec-goal-sbtn" onclick="saveSecGoal('+si+')">保存</button>'
+      +'<button class="sec-goal-cbtn" onclick="cancelSecGoal('+si+')">キャンセル</button></div>'
+      +'</div>';
+    body.appendChild(ga);
+    // 単元リスト
+    var ul=document.createElement('div');ul.className='unit-list';
+    sec.units.forEach(function(u){
+      var rec=getRec(sec.hen,u.name);
+      var rounds=rec.rounds||[];while(rounds.length<5)rounds.push({});
+      var fu=flatUnits.filter(function(x){return x.hen===sec.hen&&x.name===u.name;})[0];
+      var rem=fu?fu.remaining:0;
+      var chips=rounds.map(function(r,i){
+        return '<div class="rchip"><span class="rn">'+(i+1)+'</span><span class="rd">'+(r.date||'―')+'</span>'+fracBadge(r.correct,u.q)+'</div>';
+      }).join('');
+      var hasMemo=rec.memo&&rec.memo.trim();
+      var k=getKey(sec.hen,u.name);
+      var item=document.createElement('div');item.className='unit-item';
+      item.innerHTML='<div class="unit-item-top">'
+        +'<div class="unit-name">'+u.name+(hasMemo?' &#128203;':'')+'</div>'
+        +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;">'
+        +'<span class="unit-q">'+u.q+'問</span>'
+        +'<span class="unit-rem">残り'+rem+'問</span>'
+        +'</div>'
+        +'<button class="rec-btn" data-key="'+k+'" data-q="'+u.q+'">記録</button>'
+        +'</div>'
+        +'<div class="rounds-row">'+chips+'</div>';
+      ul.appendChild(item);
     });
-    tbl.appendChild(tbody);tblWrap.appendChild(tbl);body.appendChild(tblWrap);
+    body.appendChild(ul);
     div.appendChild(body);con.appendChild(div);
   });
-  con.addEventListener('click',e=>{
-    const btn=e.target.closest('.rec-btn');
+  con.addEventListener('click',function(e){
+    var btn=e.target.closest('.rec-btn');
     if(btn)openModal(btn.dataset.key,parseInt(btn.dataset.q)||0);
   });
   updateStats();
 }
+
 function updateStats(){
-  let doneQ=0,compQ=0,rSum=0,rCnt=0;
-  SECS.forEach((sec,si)=>{
-    let secDoneQ=0,secTotalQ=0;
-    sec.units.forEach(u=>{
-      const rec=getRec(sec.hen,u.name);
-      const rounds=rec.rounds||[];
-      while(rounds.length<5)rounds.push({});
-      secTotalQ+=u.q;
-      if(rounds[0]&&rounds[0].date){doneQ+=u.q;secDoneQ+=u.q;}
-      if(rounds[4]&&rounds[4].date)compQ+=u.q;
-      rounds.forEach(r=>{
-        const c=parseInt(r.correct);
+  var doneQ=0,rSum=0,rCnt=0;
+  SECS.forEach(function(sec,si){
+    var sd=0,st=0;
+    sec.units.forEach(function(u){
+      var rec=getRec(sec.hen,u.name);
+      var rounds=rec.rounds||[];while(rounds.length<5)rounds.push({});
+      st+=u.q;
+      if(rounds[0]&&rounds[0].date){doneQ+=u.q;sd+=u.q;}
+      rounds.forEach(function(r){
+        var c=parseInt(r.correct);
         if(!isNaN(c)&&u.q>0){rSum+=Math.round(c/u.q*100);rCnt++;}
       });
     });
-    const pct=secTotalQ>0?Math.round(secDoneQ/secTotalQ*100):0;
-    const m=document.getElementById('meta'+si);
-    const b=document.getElementById('mpf'+si);
-    if(m)m.textContent=secDoneQ.toLocaleString()+'/'+secTotalQ.toLocaleString()+'問';
+    var pct=st>0?Math.round(sd/st*100):0;
+    var m=document.getElementById('meta'+si),b=document.getElementById('mpf'+si);
+    if(m)m.textContent=sd+'/'+st+'問';
     if(b)b.style.width=pct+'%';
   });
   document.getElementById('sDone').textContent=doneQ.toLocaleString()+'問';
-  // 回転数カウント
-  const allUnits2=[];
-  SECS.forEach(sec=>sec.units.forEach(u=>allUnits2.push({hen:sec.hen,name:u.name})));
-  let completedRounds=0;
-  for(let r=0;r<5;r++){
-    const allFilled=allUnits2.every(u=>{
-      const rec=getRec(u.hen,u.name);
-      const rounds=rec.rounds||[];
-      return rounds[r]&&rounds[r].date;
-    });
-    if(allFilled)completedRounds=r+1;
-    else break;
-  }
-  document.getElementById('sComp').textContent=completedRounds+'回転';
   document.getElementById('sRate').textContent=rCnt>0?Math.round(rSum/rCnt)+'%':'―';
-  const pct=Math.round(doneQ/TOTAL*100);
+  var pct=Math.round(doneQ/TOTAL*100);
   document.getElementById('sPct').textContent=pct+'%';
   document.getElementById('sBar').style.width=pct+'%';
+  document.getElementById('headerSub').textContent=doneQ.toLocaleString()+'/'+TOTAL.toLocaleString()+'問完了 ・ '+pct+'%';
+  var au=[];SECS.forEach(function(s){s.units.forEach(function(u){au.push({hen:s.hen,name:u.name});});});
+  var cr=0;
+  for(var r=0;r<5;r++){
+    var ok=au.every(function(u){var rec=getRec(u.hen,u.name);var rr=rec.rounds||[];return rr[r]&&rr[r].date;});
+    if(ok)cr=r+1;else break;
+  }
+  document.getElementById('sComp').textContent=cr+'回転';
 }
-let editKey=null;
+
+var editKey=null;
 function openModal(key,q){
   editKey=key;modalQ=q;
-  const parts=key.split('\x01');
-  const hen=parts[0],name=parts[1];
-  const rec=getRec(hen,name);
-  const rounds=rec.rounds||[];
-  while(rounds.length<5)rounds.push({});
+  var parts=key.split('\x01'),hen=parts[0],name=parts[1];
+  var rec=getRec(hen,name);
+  var rounds=rec.rounds||[];while(rounds.length<5)rounds.push({});
   document.getElementById('mTitle').textContent=name;
   document.getElementById('mSub').textContent=hen+' ／ 全'+q+'問';
   document.getElementById('mMemo').value=rec.memo||'';
-  const con=document.getElementById('mRounds');
-  con.innerHTML='';
-  rounds.forEach((r,i)=>{
-    const d=document.createElement('div');
-    d.className='rblock';
-    const cVal=r.correct!==undefined?r.correct:'';
-    d.innerHTML='<div class="rbtitle"><span>'+(i+1)+'回目</span><span class="frac-preview" id="prev'+i+'">'+fracBadge(cVal,q)+'</span></div>'
+  var con=document.getElementById('mRounds');con.innerHTML='';
+  rounds.forEach(function(r,i){
+    var d=document.createElement('div');d.className='rblock';
+    var cv=r.correct!==undefined?r.correct:'';
+    d.innerHTML='<div class="rbtitle"><span>'+(i+1)+'回目</span><span class="frac-preview" id="prev'+i+'">'+fracBadge(cv,q)+'</span></div>'
       +'<div class="frow"><span class="flabel">日付</span><input class="finput" type="date" id="d'+i+'" value="'+(r.date||'')+'"></div>'
-      +'<div class="frow"><span class="flabel">正答数</span><div style="display:flex;align-items:center;gap:8px;"><input class="finput narrow" type="number" id="cor'+i+'" min="0" max="'+q+'" placeholder="正答数" value="'+cVal+'"><span class="fixed-total">/ '+q+'問</span></div></div>';
+      +'<div class="frow"><span class="flabel">正答数</span><div style="display:flex;align-items:center;gap:8px;"><input class="finput narrow" type="number" id="cor'+i+'" min="0" max="'+q+'" placeholder="正答数" value="'+cv+'"><span class="fixed-total">/ '+q+'問</span></div></div>';
     con.appendChild(d);
-    setTimeout(()=>{
-      const corEl=document.getElementById('cor'+i);
-      const prevEl=document.getElementById('prev'+i);
-      corEl.addEventListener('input',()=>{prevEl.innerHTML=fracBadge(corEl.value,q);});
-    },0);
+    (function(idx,tot){setTimeout(function(){
+      var ce=document.getElementById('cor'+idx),pe=document.getElementById('prev'+idx);
+      if(ce&&pe)ce.addEventListener('input',function(){pe.innerHTML=fracBadge(ce.value,tot);});
+    },0);})(i,q);
   });
   document.getElementById('ov').classList.add('open');
 }
 function closeModal(){document.getElementById('ov').classList.remove('open');editKey=null;}
 function saveModal(){
   if(!editKey)return;
-  const rounds=[];
-  for(let i=0;i<5;i++){
-    const correct=document.getElementById('cor'+i).value;
-    const c=parseInt(correct);
-    const rate=(!isNaN(c)&&modalQ>0)?Math.round(c/modalQ*100):'';
-    rounds.push({date:document.getElementById('d'+i).value,correct,total:modalQ,rate});
+  var rounds=[];
+  for(var i=0;i<5;i++){
+    var correct=document.getElementById('cor'+i).value;
+    var c=parseInt(correct);
+    var rate=(!isNaN(c)&&modalQ>0)?Math.round(c/modalQ*100):'';
+    rounds.push({date:document.getElementById('d'+i).value,correct:correct,total:modalQ,rate:rate});
   }
-  DB[editKey]={rounds,memo:document.getElementById('mMemo').value};
-  saveDB();closeModal();buildAll();
+  DB[editKey]={rounds:rounds,memo:document.getElementById('mMemo').value};
+  saveDB();closeModal();buildAll();renderCal();
 }
-function openExport(){
-  document.getElementById('expArea').value=JSON.stringify(DB,null,2);
-  document.getElementById('ovExp').classList.add('open');
-}
-function copyExport(){
-  const ta=document.getElementById('expArea');ta.select();
-  document.execCommand('copy');alert('コピーしました！');
-}
-function openImport(){
-  document.getElementById('impArea').value='';
-  document.getElementById('ovImp').classList.add('open');
-}
+function ovClose(e,id){if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');}
+function openExport(){document.getElementById('expArea').value=JSON.stringify(DB,null,2);document.getElementById('ovExp').classList.add('open');}
+function copyExport(){var ta=document.getElementById('expArea');ta.select();document.execCommand('copy');alert('コピーしました！');}
+function openImport(){document.getElementById('impArea').value='';document.getElementById('ovImp').classList.add('open');}
 function doImport(){
   try{
-    DB=JSON.parse(document.getElementById('impArea').value);
-    saveDB();
+    DB=JSON.parse(document.getElementById('impArea').value);saveDB();
     document.getElementById('ovImp').classList.remove('open');
-    initGlobalGoal();buildAll();
-    alert('インポート完了しました！');
+    initGlobalGoal();buildAll();renderCal();alert('インポート完了しました！');
   }catch(e){alert('データが正しくありません。');}
 }
-initGlobalGoal();
-buildAll();
+
+// カレンダー
+var calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),calSelected=null;
+function getDateMap(){
+  var map={};
+  SECS.forEach(function(sec){sec.units.forEach(function(u){
+    var rec=getRec(sec.hen,u.name),rounds=rec.rounds||[];
+    rounds.forEach(function(r,ri){
+      if(r&&r.date){
+        if(!map[r.date])map[r.date]={q:0,units:[]};
+        map[r.date].q+=u.q;
+        map[r.date].units.push({name:u.name,q:u.q,correct:r.correct,round:ri+1});
+      }
+    });
+  });});
+  return map;
+}
+function renderCal(){
+  var map=getDateMap(),today=new Date(),y=calYear,m=calMonth;
+  document.getElementById('calTitle').textContent=y+'年'+(m+1)+'月';
+  var first=new Date(y,m,1),last=new Date(y,m+1,0),sd=first.getDay();
+  var dows=['日','月','火','水','木','金','土'];
+  var html='';
+  dows.forEach(function(d,i){html+='<div class="cal-dow'+(i===0?' sun':i===6?' sat':'')+'">'+ d+'</div>';});
+  for(var i=0;i<sd;i++){var pd=new Date(y,m,-(sd-i-1));html+='<div class="cal-cell"><span class="cal-day other">'+pd.getDate()+'</span></div>';}
+  for(var d=1;d<=last.getDate();d++){
+    var ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var isTd=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
+    var isSel=calSelected===ds,data=map[ds];
+    var dow=new Date(y,m,d).getDay(),dc=dow===0?'sun':dow===6?'sat':'';
+    var badge='';
+    if(data){var bc=data.q>=100?'hi100':data.q>=50?'hi50':data.q>=20?'hi20':'lo';badge='<span class="cal-badge '+bc+'">'+data.q+'問</span>';}
+    html+='<div class="cal-cell'+(isTd?' today':'')+(isSel?' selected':'')+'" onclick="calSelect(\''+ds+'\')">'
+      +'<span class="cal-day '+dc+'">'+d+'</span>'+badge+'</div>';
+  }
+  var rem=(7-((sd+last.getDate())%7))%7;
+  for(var j=1;j<=rem;j++)html+='<div class="cal-cell"><span class="cal-day other">'+j+'</span></div>';
+  document.getElementById('calGrid').innerHTML=html;
+  if(calSelected)renderCalDetail(calSelected,map);
+  else{
+    var ts=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    if(map[ts])renderCalDetail(ts,map);
+    else document.getElementById('calDetail').classList.remove('show');
+  }
+}
+function calSelect(ds){calSelected=(calSelected===ds)?null:ds;renderCal();}
+function renderCalDetail(ds,map){
+  var data=map[ds],detail=document.getElementById('calDetail');
+  if(!data){detail.classList.remove('show');return;}
+  var p=ds.split('-');
+  var html='<div class="cal-detail-title">'+parseInt(p[0])+'年'+parseInt(p[1])+'月'+parseInt(p[2])+'日　合計 <b>'+data.q+'問</b></div>';
+  data.units.forEach(function(u){
+    var frac=u.correct!==''&&u.correct!==undefined?' ('+u.correct+'/'+u.q+'問)':'';
+    html+='<div class="cal-detail-row"><span class="cal-detail-name">'+u.name+' <span style="color:#aaa;">('+u.round+'回目)</span></span><span class="cal-detail-num">'+u.q+'問'+frac+'</span></div>';
+  });
+  detail.innerHTML=html;detail.classList.add('show');
+}
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}calSelected=null;renderCal();}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}calSelected=null;renderCal();}
+function calGoToday(){calYear=new Date().getFullYear();calMonth=new Date().getMonth();calSelected=null;renderCal();}
+
+initGlobalGoal();buildAll();renderCal();
 </script>
 </body>
 </html>
